@@ -17,7 +17,7 @@ public class ClientSend {
 
         try {
 
-            socket = new Socket("localhost", 3141);
+            socket = new Socket("localhost", 5000);
             OutputStream out = socket.getOutputStream();
             PrintStream ps = new PrintStream(out, true);
             System.out.println("Geben Sie eine von diesen Antworten ein:");
@@ -43,7 +43,7 @@ public class ClientSend {
                     socket.close();
                     System.out.println("Socket geschlossen...");
                 } catch (IOException e) {
-                    System.out.println("Socket nicht zu schliessen...");
+                    System.out.println("Kann Socket nicht schliessen...");
                     e.printStackTrace();
                 }
 
