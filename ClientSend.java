@@ -23,7 +23,7 @@ public class ClientSend {
             System.out.println("Geben Sie eine von diesen Antworten ein:");
             System.out.print("ja, ");
             System.out.print("nein, ");
-            System.out.print("sonstiges ");
+            System.out.print("enthalten ");
 
             ps.println(scanner.nextLine());
 
