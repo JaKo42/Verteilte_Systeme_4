@@ -27,8 +27,8 @@ public class QueryInit {
                 fos = new FileOutputStream(filename);
                 ObjectOutputStream oos = new ObjectOutputStream(fos);
 
-                oos.writeObject(ja);
                 oos.writeObject(nein);
+                oos.writeObject(ja);
                 oos.writeObject(enthaltung);
 
                 oos.flush();

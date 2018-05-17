@@ -1,22 +1,17 @@
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.ObjectInputStream;
+import java.io.*;
 
 public class Server {
 
-    /*private static int zustimmung = 0;
-    private static int ablehnung = 0;
-    private static int enthaltung = 0;
-*/
+        private SDS sds;
+
     public Server() {
         QueryInit init = new QueryInit();
     }
 
 
-    public Reply infoReply() {
+    public Reply messageReply(String message) {
 
-        SDS sds;
+
         FileInputStream fis = null;
         ObjectInputStream ois = null;
         Reply reply = null;
@@ -33,10 +28,26 @@ public class Server {
                 //TODO:Test ausgabe entfernen wenn fertig
                 System.out.println("Ausgelesene Daten: " + sds.getCategory() + " " + sds.getCounter());
 
+                if (message.equals("info")){
+                    ois.close();
+                    fis.close();
+                    reply = new Reply(true, sds.getCategory(), sds.getCounter());
+                    break;
+                }else if (message.equals("ja")|| message.equals("nein") || message.equals("enthalten")){
+//                    Semaphore sem = new Semaphore(1,true);
+                    ois.close();
+                    fis.close();
 
+                    commitAnswer(message);
+                    reply = new Reply(true, sds.getCategory(), sds.getCounter());
+                }else {
+                    System.out.println("ungültige eingabe...");
+                    reply = new Reply();
+                }
             }
 
         } catch (FileNotFoundException e) {
+            System.out.println("Datei nicht gefunden...");
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
@@ -48,46 +59,32 @@ public class Server {
         return reply;
     }
 
-}
-
-/*
-    public Reply messageProcessing(String message) {
-
-        if (message.equals("ja"))
-            return commitAnswer(1);
-        else if (message.equals("nein")) {
-            return commitAnswer(2);
-        } else if (message.equals("enthalten")) {
-            return commitAnswer(3);
-        } else if (message.equals("info")) {
-            returnInfo();
-        } else {
-        }
-        System.out.println("ungültige eingabe");
 
 
-    }
 
-    private Reply commitAnswer(int value) {
-        if (value >= 1 && value <= 3) {
-            if (value == 1) {
-                zustimmung++;
-            } else if (value == 2) {
-                ablehnung++;
-            } else if (value == 3) {
-                enthaltung++;
+
+
+    private void commitAnswer(String message) {
+        String filename = "umfragedatei.txt";
+
+        try {
+            FileOutputStream fos = new FileOutputStream(filename);
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
+
+            if ((sds.getCategory()).equals(message)) {
+                sds.setCounter(sds.getCounter() + 1);
+                oos.writeObject(sds);
+
             }
 
-            Reply reply = new Reply(true, zustimmung, ablehnung, enthaltung);
-        } else if (value == 0) {
-            Reply reply = new Reply(zustimmung, ablehnung, enthaltung);
-        } else {
-            System.out.println("ungültige eingabe...");
-            Reply reply = new Reply();
-            return reply;
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+
 
     }
 
 }
-*/
+

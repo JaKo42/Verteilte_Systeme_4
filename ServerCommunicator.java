@@ -16,6 +16,17 @@ public class ServerCommunicator extends Thread {
     private ObjectOutputStream out;
     private ObjectInputStream in;
 
+    public ServerCommunicator(Socket incoming) {
+        this.incoming = incoming;
+
+        try {
+            out = new ObjectOutputStream(incoming.getOutputStream());
+            in = new ObjectInputStream(incoming.getInputStream());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public static void main(String[] args) {
 
 
@@ -41,22 +52,11 @@ public class ServerCommunicator extends Thread {
 
     }
 
-    public ServerCommunicator(Socket incoming) {
-        this.incoming = incoming;
-
-        try {
-            out = new ObjectOutputStream(incoming.getOutputStream());
-            in = new ObjectInputStream(incoming.getInputStream());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     @Override
     public void run() {
         try {
             String message = (String) in.readObject();
-            Reply reply = server.messageProcessing(message);
+            Reply reply = server.messageReply(message);
             out.writeObject(reply);
 
             out.flush();
