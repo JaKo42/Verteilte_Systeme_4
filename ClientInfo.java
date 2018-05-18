@@ -3,11 +3,13 @@ public class ClientInfo {
     private ClientCommunicator communicator;
 
     private void outputReply(Reply reply){
-        if (reply.isStatus()){
+        if (reply != null){
             System.out.println("Aktueller Stand der Umfrage:");
-            System.out.println(reply.getCategory() + ": " + reply.getCounter());
+            for (SDS s: reply.sds) {
+                System.out.println(s.getCategory() +": " + s.getCounter());
+            }
         }else
-            System.out.println("Eingabe ungültig...");
+        System.out.println("Eingabe ungültig...");
 
     }
 
@@ -27,58 +29,4 @@ public class ClientInfo {
       */  ClientInfo client = new ClientInfo(args);
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-/*
-    private static Scanner scanner = new Scanner(System.in);
-
-
-    public static void main(String[] args) {
-
-        Socket socket = null;
-
-        try {
-
-            socket = new Socket("localhost", 5000);
-            OutputStream out = socket.getOutputStream();
-            PrintStream ps = new PrintStream(out, true);
-            System.out.println("Geben Sie eine von diesen Antworten ein:");
-            System.out.print("ja, ");
-            System.out.print("nein, ");
-            System.out.print("enthalten ");
-
-            ps.println(scanner.nextLine());
-
-
-
-
-
-        } catch (UnknownHostException e) {
-            System.out.println("Unknown Host...");
-            e.printStackTrace();
-        } catch (IOException e) {
-            System.out.println("IOProbleme...");
-            e.printStackTrace();
-        } finally {
-            if (socket != null)
-                try {
-                    socket.close();
-                    System.out.println("Socket geschlossen...");
-                } catch (IOException e) {
-                    System.out.println("Kann Socket nicht schliessen...");
-                    e.printStackTrace();
-                }
-
-        }
-    }*/
 }
