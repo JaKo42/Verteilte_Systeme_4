@@ -36,7 +36,7 @@ public class ClientCommunicator {
     }
 
 
-    public void stop(){
+    public void stop() {
 
         try {
             out.close();

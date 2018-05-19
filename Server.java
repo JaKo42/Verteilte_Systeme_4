@@ -4,6 +4,7 @@ import java.util.concurrent.Semaphore;
 public class Server {
 
     private static Semaphore sem = new Semaphore(1, true);
+    private File file = new File("umfragedatei.txt");
 
     public Server() {
         QueryInit init = new QueryInit();
@@ -19,8 +20,6 @@ public class Server {
 
         Reply reply = null;
 
-        File file = new File("umfragedatei.txt");
-        //String filename = "umfragedatei.txt";
 
 
         try {
@@ -79,26 +78,28 @@ public class Server {
 
 
     private void commitAnswer(String message, SDS[] sdsArray) {
-        String filename = "umfragedatei.txt";
 
         try {
-            FileOutputStream fos = new FileOutputStream(filename);
+            FileOutputStream fos = new FileOutputStream(file);
             ObjectOutputStream oos = new ObjectOutputStream(fos);
             switch (message) {
 
-                case "nein": sdsArray[0].setCounter(sdsArray[0].getCounter()+1);
-                break;
-
-                case "ja": sdsArray[1].setCounter(sdsArray[1].getCounter()+1);
+                case "nein":
+                    sdsArray[0].setCounter(sdsArray[0].getCounter() + 1);
                     break;
 
-                case "enthalten": sdsArray[2].setCounter(sdsArray[2].getCounter()+1);
+                case "ja":
+                    sdsArray[1].setCounter(sdsArray[1].getCounter() + 1);
+                    break;
+
+                case "enthalten":
+                    sdsArray[2].setCounter(sdsArray[2].getCounter() + 1);
                     break;
             }
 
-            for (SDS s:sdsArray) {
+            for (SDS s : sdsArray) {
                 oos.writeObject(s);
-                }
+            }
             oos.flush();
             oos.close();
             fos.close();
