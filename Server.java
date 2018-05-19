@@ -1,6 +1,9 @@
 import java.io.*;
+import java.util.concurrent.Semaphore;
 
 public class Server {
+
+    private static Semaphore sem = new Semaphore(1, true);
 
     public Server() {
         QueryInit init = new QueryInit();
@@ -11,8 +14,8 @@ public class Server {
 
         SDS[] sdsArray = new SDS[3];
 
-        FileInputStream fis = null;
-        ObjectInputStream ois = null;
+        FileInputStream fis;
+        ObjectInputStream ois;
 
         Reply reply = null;
 
@@ -25,49 +28,48 @@ public class Server {
             ois = new ObjectInputStream(fis);
 
 
+            label:
             while (true) {
                 for (int i = 0; i < sdsArray.length; i++) {
 
 
-                    //TODO: "Metadata" am anfang der SDS klasse, welche die Stelle in der Datei angibt somit wird nie das ende des files provoziert!
-                    //TODO: andere möglichkeit mit vielen "If's" die drei möglichkeiten abfiltern und so ablesen if(ois.readobject().equals "ja"
                     System.out.println(fis.getChannel().position());
                     sdsArray[i] = (SDS) ois.readObject();
-                    if (sdsArray[i].getPosition() == 2) {
 
-                        break;
 
-                    }
                     //TODO:Test ausgabe entfernen wenn fertig
                     System.out.println("Ausgelesene Daten: " + sdsArray[i].getCategory() + " " + sdsArray[i].getCounter());
                 }
 
+                switch (message) {
+                    case "info":
+                        reply = new Reply(true, sdsArray);
+                        ois.close();
+                        fis.close();
+                        break label;
 
-                if (message.equals("info")) {
-                    reply = new Reply(true, sdsArray);
-                    ois.close();
-                    fis.close();
-                    break;
-                } else if (message.equals("ja") || message.equals("nein") || message.equals("enthalten")) {
-                    //TODO: binäre semaphore einführen um simultaner zugriff zu vermeiden -> static membervariable?
-                    //Semaphore sem = new Semaphore(1,true);
-                    commitAnswer(message, sdsArray);
-                    ois.close();
-                    fis.close();
-                    reply = new Reply(true, sdsArray);
-                    break;
-                } else {
-                    System.out.println("ungültige eingabe...");
-                    reply = new Reply();
+                    case "ja":
+                    case "nein":
+                    case "enthalten":
+                        //TODO: binäre semaphore einführen um simultaner zugriff zu vermeiden -> static membervariable?
+                        sem.acquire();
+                        commitAnswer(message, sdsArray);
+                        ois.close();
+                        fis.close();
+                        reply = new Reply(true, sdsArray);
+                        break label;
+
+                    default:
+                        System.out.println("ungültige eingabe...");
+                        reply = new Reply();
+                        break;
                 }
             }
 
         } catch (FileNotFoundException e) {
             System.out.println("Datei nicht gefunden...");
             e.printStackTrace();
-        } catch (IOException | ClassNotFoundException e) {
-            //TODO entfernen wenn funktioniert
-            System.out.println("nix mehr zu lesen boy!");
+        } catch (IOException | ClassNotFoundException | InterruptedException e) {
             e.printStackTrace();
         }
 
@@ -82,26 +84,27 @@ public class Server {
         try {
             FileOutputStream fos = new FileOutputStream(filename);
             ObjectOutputStream oos = new ObjectOutputStream(fos);
+            switch (message) {
 
-            for (SDS s : sdsArray) {
-                System.out.println("For each schleife gibt aus: " + s.getCategory());
-                if ((s.getCategory()).equals(message)) {
-                    System.out.println("For each schleife hat ausgewählt: " + s.getCategory());
-                    s.setCounter(s.getCounter() + 1);
-                    System.out.println("Counter wurde geändert: " + s.getCounter());
+                case "nein": sdsArray[0].setCounter(sdsArray[0].getCounter()+1);
+                break;
 
+                case "ja": sdsArray[1].setCounter(sdsArray[1].getCounter()+1);
+                    break;
 
-                }
-                oos.writeObject(s);
-
+                case "enthalten": sdsArray[2].setCounter(sdsArray[2].getCounter()+1);
+                    break;
             }
+
+            for (SDS s:sdsArray) {
+                oos.writeObject(s);
+                }
             oos.flush();
             oos.close();
             fos.close();
+            sem.release();
 
 
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }

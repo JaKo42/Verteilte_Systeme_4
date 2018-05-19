@@ -1,7 +1,5 @@
 public class ClientPart {
 
-  private ClientCommunicator communicator;
-
   private void outputReply(Reply reply){
     if (reply != null){
       System.out.println("Aktueller Stand der Umfrage:");
@@ -15,7 +13,7 @@ public class ClientPart {
 
   public ClientPart(String[] argumente){
 
-    communicator = new ClientCommunicator("localhost");
+    ClientCommunicator communicator = new ClientCommunicator("localhost");
     Reply reply = communicator.communicate("ja");
     outputReply(reply);
   }
@@ -27,6 +25,7 @@ public class ClientPart {
             System.exit(1);
         }
       */  ClientPart client = new ClientPart(args);
+
   }
 
 }

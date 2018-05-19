@@ -9,7 +9,6 @@ public class ServerCommunicator extends Thread {
 
     private final static int PORT = 5000;
 
-    private static ServerSocket serverSocket;
     private static Server server;
 
     private Socket incoming;
@@ -31,7 +30,7 @@ public class ServerCommunicator extends Thread {
 
 
         try {
-            serverSocket = new ServerSocket(PORT);
+            ServerSocket serverSocket = new ServerSocket(PORT);
             System.out.println("ServerComunicator waiting for clients...");
 
             server = new Server();
@@ -61,9 +60,7 @@ public class ServerCommunicator extends Thread {
 
             out.flush();
             incoming.close();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
+        } catch (ClassNotFoundException | IOException e) {
             e.printStackTrace();
         }
 

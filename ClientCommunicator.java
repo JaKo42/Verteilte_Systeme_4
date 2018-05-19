@@ -28,9 +28,7 @@ public class ClientCommunicator {
         try {
             out.writeObject(message);
             reply = (Reply) in.readObject();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
+        } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
         return reply;
