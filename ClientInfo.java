@@ -1,6 +1,5 @@
 
 public class ClientInfo {
-    private ClientCommunicator communicator;
 
     private void outputReply(Reply reply){
         if (reply != null){
@@ -15,7 +14,7 @@ public class ClientInfo {
 
     public ClientInfo(String[] argumente){
 
-        communicator = new ClientCommunicator("localhost");
+        ClientCommunicator communicator = new ClientCommunicator("localhost");
         Reply reply = communicator.communicate("info");
         outputReply(reply);
     }
