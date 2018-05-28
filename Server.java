@@ -5,15 +5,16 @@ public class Server {
 
     private static Semaphore sem = new Semaphore(1, true);
     private File file = new File("umfragedatei.txt");
+    private SDS[] sdsArray;
 
     public Server() {
         QueryInit init = new QueryInit();
+        sdsArray = new SDS[3];
     }
 
 
-    public Reply messageReply(String message) {
+    public synchronized Reply messageReply(String message) {
 
-        SDS[] sdsArray = new SDS[3];
 
         FileInputStream fis;
         ObjectInputStream ois;
@@ -32,17 +33,14 @@ public class Server {
                 for (int i = 0; i < sdsArray.length; i++) {
 
 
-                    System.out.println(fis.getChannel().position());
                     sdsArray[i] = (SDS) ois.readObject();
 
 
-                    //TODO:Test ausgabe entfernen wenn fertig
-                    System.out.println("Ausgelesene Daten: " + sdsArray[i].getCategory() + " " + sdsArray[i].getCounter());
                 }
 
                 switch (message) {
                     case "info":
-                        reply = new Reply(true, sdsArray);
+                        reply = new Reply(sdsArray);
                         ois.close();
                         fis.close();
                         break label;
@@ -50,12 +48,12 @@ public class Server {
                     case "ja":
                     case "nein":
                     case "enthalten":
-                        //TODO: binäre semaphore einführen um simultaner zugriff zu vermeiden -> static membervariable?
-                        sem.acquire();
+                       // sem.acquire();
                         commitAnswer(message, sdsArray);
                         ois.close();
                         fis.close();
-                        reply = new Reply(true, sdsArray);
+                        reply = new Reply(sdsArray);
+                        //sem.release();
                         break label;
 
                     default:
@@ -68,7 +66,7 @@ public class Server {
         } catch (FileNotFoundException e) {
             System.out.println("Datei nicht gefunden...");
             e.printStackTrace();
-        } catch (IOException | ClassNotFoundException | InterruptedException e) {
+        } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
 

@@ -1,34 +1,44 @@
+import java.util.Scanner;
+
 public class ClientPart {
 
-    public ClientPart(String[] argumente) {
+    public ClientPart(String host, String message) {
 
-        ClientCommunicator communicator = new ClientCommunicator(argumente[0]);
-        Reply reply = communicator.communicate(argumente[1]);
+        ClientCommunicator communicator = new ClientCommunicator(host);
+        Reply reply = communicator.communicate(message);
         outputReply(reply);
     }
 
     public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        String host;
+        String message;
+        System.out.println("Host Adresse eingeben:");
+        host = scanner.nextLine();
 
-        if (args.length != 2) {
-            System.out.println("Syntax: java Client <server> <message>");
-            System.exit(1);
-        }
-        while (true) {
-            ClientPart client = new ClientPart(args);
+        System.out.println("\nNachricht eingeben\nGültige eingaben sind:");
+        System.out.println("'ja', 'nein', 'enthalten'");
+        message = scanner.nextLine();
 
+        ClientPart client = new ClientPart(host, message);
 
-        }
     }
 
     private void outputReply(Reply reply) {
-        if (reply != null) {
-            System.out.println("Aktueller Stand der Umfrage:");
-            for (SDS s : reply.sds) {
-                System.out.println(s.getCategory() + ": " + s.getCounter());
-            }
-        } else
-            System.out.println("Eingabe ungültig...");
+        try {
 
+
+            if (reply != null) {
+                System.out.println("\nAktueller Stand der Umfrage:");
+                for (SDS s : reply.sds) {
+                    System.out.println(s.getCategory() + ": " + s.getCounter());
+                }
+                System.out.println("\nIhre Stimme wurde gezählt!");
+            }
+        } catch (NullPointerException e) {
+            System.out.println("Eingabe ungültig...");
+            e.printStackTrace();
+        }
     }
 
 }
